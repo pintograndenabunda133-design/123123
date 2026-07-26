@@ -27,7 +27,6 @@ local Config = {
         keybind = Enum.UserInputType.MouseButton2,
         prediction = 0.165,
         targetPart = "Head", -- "Head", "Torso", "RootPart"
-        headOffset = 2.0, -- Altura da mira em studs acima da RootPart
     },
     esp = {
         enabled = false,
@@ -466,10 +465,6 @@ createDropdown(contentFrame, "Mirar em", partNames, currentPartIndex, function(i
     currentPartIndex = index
 end)
 
-createSlider(contentFrame, "Altura da Mira", 1, 4, Config.aimbot.headOffset, 0.1, function(val)
-    Config.aimbot.headOffset = val
-end)
-
 createToggle(contentFrame, "Aimbot Silencioso", Config.aimbot.silent, function(val)
     Config.aimbot.silent = val
 end)
@@ -526,6 +521,134 @@ createSectionTitle(contentFrame, "TEAM CHECK")
 
 createToggle(contentFrame, "Team Check Ativo", Config.teamCheck.enabled, function(val)
     Config.teamCheck.enabled = val
+end)
+
+createSpacer(contentFrame)
+
+-- SEÇÃO: SALVAR CONFIG
+createSectionTitle(contentFrame, "CONFIGURAÇÕES")
+
+-- Botão Salvar
+local saveFrame = Instance.new("Frame")
+saveFrame.Size = UDim2.new(1, -16, 0, 42)
+saveFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+saveFrame.BorderSizePixel = 0
+saveFrame.Parent = contentFrame
+
+local saveBtn = Instance.new("TextButton")
+saveBtn.Size = UDim2.new(1, -24, 0, 30)
+saveBtn.Position = UDim2.new(0, 12, 0.5, -15)
+saveBtn.BackgroundColor3 = Color3.fromRGB(99, 102, 241)
+saveBtn.BorderSizePixel = 0
+saveBtn.Text = "Salvar Configurações"
+saveBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+saveBtn.TextSize = 13
+saveBtn.Font = Enum.Font.GothamBold
+saveBtn.Parent = saveFrame
+
+local saveBtnCorner = Instance.new("UICorner")
+saveBtnCorner.CornerRadius = UDim.new(0, 6)
+saveBtnCorner.Parent = saveBtn
+
+-- Botão Carregar
+local loadFrame = Instance.new("Frame")
+loadFrame.Size = UDim2.new(1, -16, 0, 42)
+loadFrame.BackgroundColor3 = Color3.fromRGB(24, 24, 32)
+loadFrame.BorderSizePixel = 0
+loadFrame.Parent = contentFrame
+
+local loadBtn = Instance.new("TextButton")
+loadBtn.Size = UDim2.new(1, -24, 0, 30)
+loadBtn.Position = UDim2.new(0, 12, 0.5, -15)
+loadBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+loadBtn.BorderSizePixel = 0
+loadBtn.Text = "Carregar Configurações"
+loadBtn.TextColor3 = Color3.fromRGB(200, 200, 220)
+loadBtn.TextSize = 13
+loadBtn.Font = Enum.Font.GothamBold
+loadBtn.Parent = loadFrame
+
+local loadBtnCorner = Instance.new("UICorner")
+loadBtnCorner.CornerRadius = UDim.new(0, 6)
+loadBtnCorner.Parent = loadBtn
+
+-- Variável pra armazenar config
+local savedConfig = nil
+
+saveBtn.MouseButton1Click:Connect(function()
+    savedConfig = {
+        aimbot = {
+            enabled = Config.aimbot.enabled,
+            smoothness = Config.aimbot.smoothness,
+            fov = Config.aimbot.fov,
+            silent = Config.aimbot.silent,
+            targetTeam = Config.aimbot.targetTeam,
+            prediction = Config.aimbot.prediction,
+            targetPart = Config.aimbot.targetPart,
+        },
+        esp = {
+            enabled = Config.esp.enabled,
+            skeleton = Config.esp.skeleton,
+            names = Config.esp.names,
+            health = Config.esp.health,
+            distance = Config.esp.distance,
+            tracers = Config.esp.tracers,
+            teamColor = Config.esp.teamColor,
+            showTeam = Config.esp.showTeam,
+        },
+        teamCheck = {
+            enabled = Config.teamCheck.enabled,
+        },
+    }
+    saveBtn.Text = "✓ Salvo!"
+    saveBtn.BackgroundColor3 = Color3.fromRGB(50, 220, 100)
+    task.delay(1.5, function()
+        saveBtn.Text = "Salvar Configurações"
+        saveBtn.BackgroundColor3 = Color3.fromRGB(99, 102, 241)
+    end)
+    print("[ProMenu] Configurações salvas com sucesso!")
+end)
+
+loadBtn.MouseButton1Click:Connect(function()
+    if not savedConfig then
+        loadBtn.Text = "Nenhuma config salva!"
+        loadBtn.BackgroundColor3 = Color3.fromRGB(180, 50, 50)
+        task.delay(1.5, function()
+            loadBtn.Text = "Carregar Configurações"
+            loadBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+        end)
+        return
+    end
+
+    -- Carregar Aimbot
+    Config.aimbot.enabled = savedConfig.aimbot.enabled
+    Config.aimbot.smoothness = savedConfig.aimbot.smoothness
+    Config.aimbot.fov = savedConfig.aimbot.fov
+    Config.aimbot.silent = savedConfig.aimbot.silent
+    Config.aimbot.targetTeam = savedConfig.aimbot.targetTeam
+    Config.aimbot.prediction = savedConfig.aimbot.prediction
+    Config.aimbot.targetPart = savedConfig.aimbot.targetPart
+
+    -- Carregar ESP
+    Config.esp.enabled = savedConfig.esp.enabled
+    Config.esp.skeleton = savedConfig.esp.skeleton
+    Config.esp.names = savedConfig.esp.names
+    Config.esp.health = savedConfig.esp.health
+    Config.esp.distance = savedConfig.esp.distance
+    Config.esp.tracers = savedConfig.esp.tracers
+    Config.esp.teamColor = savedConfig.esp.teamColor
+    Config.esp.showTeam = savedConfig.esp.showTeam
+
+    -- Carregar Team Check
+    Config.teamCheck.enabled = savedConfig.teamCheck.enabled
+
+    loadBtn.Text = "✓ Carregado!"
+    loadBtn.BackgroundColor3 = Color3.fromRGB(50, 220, 100)
+    task.delay(1.5, function()
+        loadBtn.Text = "Carregar Configurações"
+        loadBtn.BackgroundColor3 = Color3.fromRGB(45, 45, 55)
+    end)
+    print("[ProMenu] Configurações carregadas com sucesso!")
 end)
 
 -- ============================================================
@@ -586,24 +709,23 @@ end)
 --  AIMBOT LOGIC
 -- ============================================================
 
--- Pegar a posição fixa do target (sem seguir animação)
+-- Pegar a posição do target
 local function getTargetPosition(character)
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
-    if not rootPart then return nil end
-
     local partName = Config.aimbot.targetPart
 
     if partName == "Head" then
-        -- Usar RootPart + offset configurável pra cima (altura da cabeça)
-        return rootPart.Position + Vector3.new(0, Config.aimbot.headOffset, 0)
+        -- Usar a Head real do personagem (posição atual)
+        local head = character:FindFirstChild("Head")
+        if head then return head.Position end
     elseif partName == "Torso" then
-        -- Usar RootPart como base (já é o torso)
-        return rootPart.Position
+        local torso = character:FindFirstChild("UpperTorso") or character:FindFirstChild("Torso")
+        if torso then return torso.Position end
     elseif partName == "RootPart" then
-        return rootPart.Position
+        local rootPart = character:FindFirstChild("HumanoidRootPart")
+        if rootPart then return rootPart.Position end
     end
 
-    return rootPart.Position
+    return nil
 end
 
 local function getClosestPlayer(mousePos)
@@ -615,9 +737,6 @@ local function getClosestPlayer(mousePos)
             local humanoid = target.Character:FindFirstChild("Humanoid")
             if not humanoid or humanoid.Health <= 0 then continue end
             if Config.aimbot.targetTeam and player.Team and target.Team and player.Team == target.Team then continue end
-
-            local rootPart = target.Character:FindFirstChild("HumanoidRootPart")
-            if not rootPart then continue end
 
             local targetPos = getTargetPosition(target.Character)
             if not targetPos then continue end
